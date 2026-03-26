@@ -10,6 +10,10 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [selectedZona, setSelectedZona] = useState<ZonaType | "todas">("todas");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [selectedActivity, setSelectedActivity] = useState<
+    "missa" | "confissao" | "adoracao" | null
+  >(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -21,15 +25,72 @@ const Index = () => {
     loadData();
   }, []);
 
+  function hasActivityOnDay(church: ChurchSchedule, day: string) {
+    return (
+      church.missasSemanais[day] ||
+      church.confissao[day] ||
+      church.adoracao[day]
+    );
+  }
+
+  const days = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"];
+
+  function hasActivityType(
+    church: ChurchSchedule,
+    type: "missa" | "confissao" | "adoracao",
+  ) {
+    const activity =
+      type === "missa"
+        ? church.missasSemanais
+        : type === "confissao"
+          ? church.confissao
+          : church.adoracao;
+
+    return days.some((day) => activity[day]);
+  }
+
+  function hasActivityOnSpecificDay(
+    church: ChurchSchedule,
+    activity: "missa" | "confissao" | "adoracao",
+    day: string,
+  ) {
+    const source =
+      activity === "missa"
+        ? church.missasSemanais
+        : activity === "confissao"
+          ? church.confissao
+          : church.adoracao;
+
+    const value = source[day];
+
+    return value && value.trim() !== "";
+  }
+
   const filteredChurches = churches.filter((church) => {
     const matchesZona =
       selectedZona === "todas" || church.zona === selectedZona;
+
     const matchesSearch =
       !searchQuery ||
       church.igreja.toLowerCase().includes(searchQuery.toLowerCase()) ||
       church.bairro.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return matchesZona && matchesSearch;
+    let matchesDay = true;
+    let matchesActivity = true;
+
+    if (selectedDay && selectedActivity) {
+      matchesActivity = hasActivityOnSpecificDay(
+        church,
+        selectedActivity,
+        selectedDay,
+      );
+    } else if (selectedDay) {
+      matchesDay = hasActivityOnDay(church, selectedDay);
+    } else if (selectedActivity) {
+      matchesActivity = hasActivityType(church, selectedActivity);
+    }
+
+    return matchesZona && matchesSearch && matchesDay && matchesActivity;
   });
 
   return (
@@ -53,6 +114,10 @@ const Index = () => {
               onZonaChange={setSelectedZona}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
+              selectedDay={selectedDay}
+              onDayChange={setSelectedDay}
+              selectedActivity={selectedActivity}
+              onActivityChange={setSelectedActivity}
             />
           </div>
         </div>
