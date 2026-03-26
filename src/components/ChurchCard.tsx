@@ -1,7 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ChurchSchedule } from "@/types/church";
-import { Church, MapPin, Instagram, Phone } from "lucide-react";
+import { Church, MapPin, Instagram, Phone, ScrollText } from "lucide-react";
 
 interface ChurchCardProps {
   church: ChurchSchedule;
@@ -142,6 +150,33 @@ export const ChurchCard = ({ church }: ChurchCardProps) => {
           </p>
         )}
       </CardContent>
+
+      {(church.noticias) && (
+        <div className="px-6 pb-6 pt-0">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full gap-2 border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider h-10 transition-all duration-300"
+              >
+                <ScrollText className="h-4 w-4" />
+                Ver Notícias
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md bg-card/95 backdrop-blur-sm border-border">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-primary">
+                  <ScrollText className="h-5 w-5" />
+                  Notícias da semana- {church.igreja}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="mt-4 text-sm leading-relaxed text-foreground whitespace-pre-wrap max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                {church.noticias}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
     </Card>
   );
 };

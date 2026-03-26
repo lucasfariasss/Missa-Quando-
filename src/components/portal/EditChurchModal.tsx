@@ -31,6 +31,7 @@ interface Church {
   adoracao_sex: string | null;
   adoracao_sab: string | null;
   adoracao_dom: string | null;
+  noticias: string | null;
 }
 
 interface EditChurchModalProps {
@@ -142,6 +143,21 @@ export const EditChurchModal = ({ church, isOpen, onClose, onSaved }: EditChurch
           {renderScheduleSection("Horários de Missas", "missa")}
           {renderScheduleSection("Horários de Confissão", "confissao")}
           {renderScheduleSection("Horários de Adoração", "adoracao")}
+
+          {/* Notícias */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold text-primary">Notícias da Semana</h4>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-muted-foreground">Atualizações e avisos da paróquia</label>
+              <textarea
+                value={form.noticias ?? ""}
+                onChange={(e) => handleChange("noticias", e.target.value)}
+                placeholder="Ex: Teremos missa extra na quarta-feira às 19h..."
+                rows={4}
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="sticky bottom-0 flex justify-end gap-3 border-t border-border bg-card px-6 py-4">

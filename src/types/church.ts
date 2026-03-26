@@ -4,7 +4,8 @@ export interface ChurchSchedule {
   zona: string;
   contatos: string;
   instagram: string;
-  
+  noticias?: string;
+
   // Missas Semanais
   missasSemanais: {
     seg?: string;
@@ -15,7 +16,7 @@ export interface ChurchSchedule {
     sab?: string;
     dom?: string;
   };
-  
+
   // Confissão
   confissao: {
     seg?: string;
@@ -26,7 +27,7 @@ export interface ChurchSchedule {
     sab?: string;
     dom?: string;
   };
-  
+
   // Adoração
   adoracao: {
     seg?: string;
