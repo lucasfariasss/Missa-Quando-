@@ -21,12 +21,14 @@ const Index = () => {
     loadData();
   }, []);
 
-  const filteredChurches = churches.filter(church => {
-    const matchesZona = selectedZona === "todas" || church.zona === selectedZona;
-    const matchesSearch = !searchQuery || 
+  const filteredChurches = churches.filter((church) => {
+    const matchesZona =
+      selectedZona === "todas" || church.zona === selectedZona;
+    const matchesSearch =
+      !searchQuery ||
       church.igreja.toLowerCase().includes(searchQuery.toLowerCase()) ||
       church.bairro.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     return matchesZona && matchesSearch;
   });
 
@@ -41,10 +43,11 @@ const Index = () => {
                 missaquando?
               </h1>
               <p className="mt-2 text-base md:text-lg text-muted-foreground">
-                Encontre horários de Missas, Confissões e Adorações em João Pessoa
+                Encontre horários de Missas, Confissões e Adorações em João
+                Pessoa
               </p>
             </div>
-            
+
             <Filters
               selectedZona={selectedZona}
               onZonaChange={setSelectedZona}
@@ -73,10 +76,11 @@ const Index = () => {
         ) : (
           <>
             <div className="mb-6 text-sm text-muted-foreground text-center">
-              Exibindo {filteredChurches.length} {filteredChurches.length === 1 ? 'igreja' : 'igrejas'}
+              Exibindo {filteredChurches.length}{" "}
+              {filteredChurches.length === 1 ? "igreja" : "igrejas"}
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
               {filteredChurches.map((church, index) => (
                 <ChurchCard key={`${church.igreja}-${index}`} church={church} />
               ))}
@@ -88,7 +92,10 @@ const Index = () => {
       {/* Footer */}
       <footer className="mt-16 border-t border-border/50 bg-card/50">
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>Dados atualizados regularmente • Para sugestões e correções, entre em contato</p>
+          <p>
+            Dados atualizados regularmente • Para sugestões e correções, entre
+            em contato
+          </p>
         </div>
       </footer>
     </div>
