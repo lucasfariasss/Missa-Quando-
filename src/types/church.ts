@@ -5,6 +5,9 @@ export interface ChurchSchedule {
   contatos: string;
   instagram: string;
   noticias?: string;
+  lat?: number;
+  lng?: number;
+  distanceToUser?: number;
 
   // Missas Semanais
   missasSemanais: {
