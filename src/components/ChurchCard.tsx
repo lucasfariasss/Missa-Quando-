@@ -1,15 +1,9 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { ChurchSchedule } from "@/types/church";
-import { Church, MapPin, Instagram, Phone, ScrollText } from "lucide-react";
+import { Church, MapPin, Instagram, Phone, ScrollText, ChevronDown, ChevronUp, Navigation } from "lucide-react";
 
 interface ChurchCardProps {
   church: ChurchSchedule;
@@ -33,6 +27,8 @@ const ZONE_LABELS: Record<string, string> = {
 };
 
 export const ChurchCard = ({ church }: ChurchCardProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const hasAnySchedule =
     DAYS.some((day) => church.missasSemanais?.[day.key]) ||
     DAYS.some((day) => church.confissao?.[day.key]) ||
@@ -71,7 +67,12 @@ export const ChurchCard = ({ church }: ChurchCardProps) => {
   };
 
   return (
-    <Card className="break-inside-avoid overflow-hidden transition-all duration-300 hover:shadow-[var(--shadow-elevated)] border-border/50">
+    <Card 
+      className={`break-inside-avoid overflow-hidden transition-all duration-300 hover:shadow-[var(--shadow-elevated)] border-border/50 cursor-pointer ${
+        isExpanded ? "shadow-[var(--shadow-elevated)] ring-1 ring-primary/20" : ""
+      }`}
+      onClick={() => setIsExpanded(!isExpanded)}
+    >
       <CardHeader className="pb-4 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 space-y-2">
@@ -89,8 +90,21 @@ export const ChurchCard = ({ church }: ChurchCardProps) => {
                   {ZONE_LABELS[church.zona] || church.zona}
                 </Badge>
               )}
+              {church.distanceToUser !== undefined && (
+                <Badge variant="outline" className="gap-1 border-primary/30 text-primary">
+                  {church.distanceToUser.toFixed(1)} km
+                </Badge>
+              )}
             </div>
           </div>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 text-muted-foreground hover:text-primary shrink-0 transition-transform duration-200"
+            onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+          >
+            {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+          </Button>
         </div>
 
         {(church.contatos || church.instagram) && (
@@ -123,58 +137,61 @@ export const ChurchCard = ({ church }: ChurchCardProps) => {
         )}
       </CardHeader>
 
-      <CardContent className={hasAnySchedule ? "space-y-6 pt-6" : "pt-4 pb-4"}>
-        {hasAnySchedule ? (
-          <>
-            {renderScheduleSection(
-              "MISSAS",
-              church.missasSemanais,
-              <Church className="h-4 w-4" />,
-            )}
+      {isExpanded && (
+        <div className="animate-in slide-in-from-top-2 fade-in duration-200">
+          <CardContent className={hasAnySchedule ? "space-y-6 pt-6 border-t border-border/30 bg-background/50" : "pt-4 pb-4 border-t border-border/30 bg-background/50"}>
+            {hasAnySchedule ? (
+              <>
+                {renderScheduleSection(
+                  "MISSAS",
+                  church.missasSemanais,
+                  <Church className="h-4 w-4" />,
+                )}
 
-            {renderScheduleSection(
-              "CONFISSÃO",
-              church.confissao,
-              <span className="text-xs">🙏</span>,
-            )}
+                {renderScheduleSection(
+                  "CONFISSÃO",
+                  church.confissao,
+                  <span className="text-xs">🙏</span>,
+                )}
 
-            {renderScheduleSection(
-              "ADORAÇÃO",
-              church.adoracao,
-              <span className="text-xs">✨</span>,
+                {renderScheduleSection(
+                  "ADORAÇÃO",
+                  church.adoracao,
+                  <span className="text-xs">✨</span>,
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center">
+                Horários ainda não informados
+              </p>
             )}
-          </>
-        ) : (
-          <p className="text-sm text-muted-foreground text-center">
-            Horários ainda não informados
-          </p>
-        )}
-      </CardContent>
+          </CardContent>
 
-      {(church.noticias) && (
-        <div className="px-6 pb-6 pt-0">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full gap-2 border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider h-10 transition-all duration-300"
-              >
+          {church.noticias && (
+            <div className="px-6 pb-6 pt-0 bg-background/50 space-y-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary">
                 <ScrollText className="h-4 w-4" />
-                Ver Notícias
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md bg-card/95 backdrop-blur-sm border-border">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-primary">
-                  <ScrollText className="h-5 w-5" />
-                  Notícias da semana- {church.igreja}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="mt-4 text-sm leading-relaxed text-foreground whitespace-pre-wrap max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <span>Notícias da semana</span>
+              </div>
+              <div className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap bg-primary/5 p-4 rounded-lg border border-primary/10">
                 {church.noticias}
               </div>
-            </DialogContent>
-          </Dialog>
+            </div>
+          )}
+
+          <div className="px-6 pb-6 bg-background/50">
+            <Button
+              variant="default"
+              className="w-full gap-2 transition-all duration-300 shadow-sm hover:shadow"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${church.igreja} ${church.bairro}`)}`, '_blank');
+              }}
+            >
+              <Navigation className="h-4 w-4" />
+              Abrir no Google Maps
+            </Button>
+          </div>
         </div>
       )}
     </Card>
