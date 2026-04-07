@@ -41,6 +41,7 @@ export type Database = {
           adoracao_sex: string | null
           adoracao_sab: string | null
           adoracao_dom: string | null
+          image_url: string | null
           noticias: string | null
           created_at: string
         }

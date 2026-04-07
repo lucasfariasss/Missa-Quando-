@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, X } from "lucide-react";
+import { Loader2, X, Upload, Trash2, Image as ImageIcon } from "lucide-react";
 
 interface Church {
   id: string;
@@ -32,6 +32,7 @@ interface Church {
   adoracao_sab: string | null;
   adoracao_dom: string | null;
   noticias: string | null;
+  image_url: string | null;
 }
 
 interface EditChurchModalProps {
@@ -54,6 +55,7 @@ const DAYS = [
 export const EditChurchModal = ({ church, isOpen, onClose, onSaved }: EditChurchModalProps) => {
   const [form, setForm] = useState<Church>({ ...church });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     setForm({ ...church });
@@ -63,6 +65,51 @@ export const EditChurchModal = ({ church, isOpen, onClose, onSaved }: EditChurch
 
   const handleChange = (field: keyof Church, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value || null }));
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      // Validação básica
+      if (!file.type.startsWith("image/")) {
+        toast.error("Por favor, selecione um arquivo de imagem.");
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("A imagem deve ter no máximo 2MB.");
+        return;
+      }
+
+      setUploading(true);
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${church.id}_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("church-photos")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("church-photos")
+        .getPublicUrl(filePath);
+
+      setForm((prev) => ({ ...prev, image_url: publicUrl }));
+      toast.success("Imagem enviada com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao fazer upload da imagem.");
+      console.error(error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setForm((prev) => ({ ...prev, image_url: null }));
   };
 
   const handleSave = async () => {
@@ -136,6 +183,52 @@ export const EditChurchModal = ({ church, isOpen, onClose, onSaved }: EditChurch
               {renderField("Zona", "zona")}
               {renderField("Contatos", "contatos")}
               {renderField("Instagram", "instagram")}
+            </div>
+          </div>
+
+          {/* Gerenciamento de Imagem */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold text-primary">Foto da Igreja</h4>
+            <div className="flex flex-col gap-4">
+              {form.image_url ? (
+                <div className="relative group w-full max-w-sm aspect-video rounded-lg overflow-hidden border border-border bg-muted">
+                  <img 
+                    src={form.image_url} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button
+                      onClick={handleRemoveImage}
+                      className="p-2 bg-destructive text-destructive-foreground rounded-full hover:scale-110 transition-transform"
+                      title="Remover imagem"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 hover:border-primary/50 transition-all">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    {uploading ? (
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground">Clique para fazer upload da foto</p>
+                        <p className="text-xs text-muted-foreground/60 mt-1">Imagens até 2MB</p>
+                      </>
+                    )}
+                  </div>
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*" 
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                  />
+                </label>
+              )}
             </div>
           </div>
 

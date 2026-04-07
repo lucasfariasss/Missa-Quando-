@@ -3,7 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChurchSchedule } from "@/types/church";
-import { Church, MapPin, Instagram, Phone, ScrollText, ChevronDown, ChevronUp, Navigation } from "lucide-react";
+import { Church, MapPin, Instagram, Phone, ScrollText, ChevronDown, ChevronUp, Navigation, Image as ImageIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 interface ChurchCardProps {
   church: ChurchSchedule;
@@ -28,6 +35,7 @@ const ZONE_LABELS: Record<string, string> = {
 
 export const ChurchCard = ({ church }: ChurchCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
   const hasAnySchedule =
     DAYS.some((day) => church.missasSemanais?.[day.key]) ||
@@ -179,7 +187,22 @@ export const ChurchCard = ({ church }: ChurchCardProps) => {
             </div>
           )}
 
-          <div className="px-6 pb-6 bg-background/50">
+          <div className="px-6 pb-6 bg-background/50 flex flex-col sm:flex-row gap-3">
+            <Button
+              variant="outline"
+              className="w-full gap-2 transition-all duration-300 shadow-sm hover:shadow"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!church.image_url) {
+                  toast.info("Igreja sem foto cadastrada");
+                } else {
+                  setIsPhotoModalOpen(true);
+                }
+              }}
+            >
+              <ImageIcon className="h-4 w-4" />
+              Ver Foto
+            </Button>
             <Button
               variant="default"
               className="w-full gap-2 transition-all duration-300 shadow-sm hover:shadow"
@@ -194,6 +217,26 @@ export const ChurchCard = ({ church }: ChurchCardProps) => {
           </div>
         </div>
       )}
+
+      <Dialog open={isPhotoModalOpen} onOpenChange={setIsPhotoModalOpen}>
+        <DialogContent className="max-w-3xl p-0 overflow-hidden border-none bg-transparent shadow-2xl">
+          <DialogTitle className="sr-only">Foto de {church.igreja}</DialogTitle>
+          <div className="relative group">
+            <img 
+              src={church.image_url} 
+              alt={church.igreja}
+              className="w-full h-auto object-contain max-h-[80vh] rounded-lg shadow-2xl"
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 pt-12">
+              <h3 className="text-xl font-bold text-white mb-1">{church.igreja}</h3>
+              <p className="text-white/80 text-sm flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {church.bairro}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

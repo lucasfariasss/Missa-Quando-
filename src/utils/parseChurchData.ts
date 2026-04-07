@@ -49,6 +49,7 @@ export const parseChurchData = async (): Promise<ChurchSchedule[]> => {
         dom: row.adoracao_dom || undefined,
       },
       noticias: row.noticias || undefined,
+      image_url: row.image_url || undefined,
     }));
   } catch (error) {
     console.error('Error fetching church data:', error);
