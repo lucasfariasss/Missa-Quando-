@@ -31,6 +31,16 @@ O `AdminPortal` consome a `role` do usuário logado na inicialização e gerenci
 ### Segurança (RLS - Row Level Security)
 As políticas (Policies) nativas do Supabase garantem que a tabela principal de dados `churches` seja de leitura pública para qualquer visitante do site, enquanto as inserções, atualizações e operações nas tabelas `profiles` e `church_editors` ficam firmemente trancadas apenas para os usuários autenticados que passam nas validações.
 
+## Screenshots
+
+| Página Inicial | Filtros Ativos |
+|---|---|
+| ![Página Inicial](./screenshots/landing_page.png) | ![Filtros](./screenshots/filter_active.png) |
+
+| Busca de Igrejas | Portal Administrativo |
+|---|---|
+| ![Busca](./screenshots/search_results.png) | ![Login Admin](./screenshots/admin_login.png) |
+
 ## Executando o Projeto
 
 ```sh
@@ -42,3 +52,29 @@ npm run dev
 ```
 
 > **Aviso de Migração:** A dependência da leitura de arquivos locais foi removida do frontend na versão atual, o antigo arquivo `/public/data/horarios.xlsx` e as bibliotecas de parser de planilhas foram removidas em prol da integração direta com banco de dados via `@supabase/supabase-js`.
+
+## Equipe
+
+* **ANA GABRIELA MAIA LIMA**
+  - Matrícula: 20230144831
+  - Curso: CIÊNCIA DA COMPUTAÇÃO/CI
+
+* **BERTRAND LIRA VELOSO**
+  - Matrícula: 20230144878
+  - Curso: CIÊNCIA DA COMPUTAÇÃO/CI
+  - E-mail: blv@academico.ufpb.br
+
+* **LUCAS FARIAS DE MEDEIROS**
+  - Matrícula: 20220054884
+  - Curso: CIÊNCIA DA COMPUTAÇÃO/CI
+  - E-mail: lucasfm.py@gmail.com
+
+* **RYAN DUARTE SARMENTO PEDROSA**
+  - Matrícula: 20190175837
+  - Curso: CIÊNCIA DA COMPUTAÇÃO/CI
+  - E-mail: ryandspedrosa@gmail.com
+
+* **VINICIUS LEITE FERREIRA ALVES**
+  - Matrícula: 20190031111
+  - Curso: CIÊNCIA DA COMPUTAÇÃO/CI
+  - E-mail: viniciusleitealves@gmail.com
